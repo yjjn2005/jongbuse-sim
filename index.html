@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>26세법개정안 종합부동산세 시뮬레이션</title>
+<style>
+:root{
+  --navy:#0F2544; --navy2:#1B3A63; --gold:#C6A15B; --gold-l:#E8D5B0;
+  --bg:#F4F6F9; --card:#FFFFFF; --line:#DDE3EC; --txt:#1A2433; --sub:#6B7686;
+  --red:#C0392B; --green:#1E7B4F;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Malgun Gothic","맑은 고딕",Pretendard,-apple-system,sans-serif;}
+body{background:var(--bg);color:var(--txt);padding-bottom:60px;}
+header{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);color:#fff;padding:22px 16px 18px;}
+header .brand{font-size:11px;letter-spacing:2px;color:var(--gold);font-weight:bold;}
+header h1{font-size:20px;margin-top:4px;line-height:1.35;}
+header .sub{font-size:12px;color:#B9C4D4;margin-top:6px;}
+.wrap{max-width:860px;margin:0 auto;padding:14px;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px;box-shadow:0 1px 3px rgba(15,37,68,.06);}
+.card h2{font-size:15px;color:var(--navy);border-left:4px solid var(--gold);padding-left:8px;margin-bottom:12px;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:560px){.grid{grid-template-columns:1fr;}}
+label{display:block;font-size:12px;color:var(--sub);margin-bottom:4px;font-weight:bold;}
+input[type=number],select{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;font-size:15px;background:#fff;}
+input:focus,select:focus{outline:2px solid var(--gold);border-color:var(--gold);}
+.field{margin-bottom:4px;}
+.hint{font-size:11px;color:var(--sub);margin-top:3px;}
+.seg{display:flex;gap:6px;flex-wrap:wrap;}
+.seg button{flex:1;min-width:70px;padding:10px 6px;border:1px solid var(--line);background:#fff;border-radius:8px;font-size:13px;cursor:pointer;color:var(--txt);}
+.seg button.on{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:bold;}
+.yeartabs{display:flex;gap:6px;margin:4px 0 12px;}
+.yeartabs button{flex:1;padding:12px 4px;border:1px solid var(--line);background:#fff;border-radius:10px;font-size:14px;font-weight:bold;cursor:pointer;}
+.yeartabs button.on{background:var(--gold);border-color:var(--gold);color:var(--navy);}
+.cmpgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+@media(max-width:560px){.cmpgrid{grid-template-columns:repeat(2,1fr);}}
+.cmp{border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center;cursor:pointer;}
+.cmp.on{border-color:var(--gold);background:#FFFDF6;box-shadow:0 0 0 2px var(--gold-l);}
+.cmp .yy{font-size:12px;color:var(--sub);font-weight:bold;}
+.cmp .amt{font-size:16px;font-weight:bold;color:var(--navy);margin-top:4px;word-break:keep-all;}
+.cmp .diff{font-size:11px;margin-top:3px;}
+.up{color:var(--red);} .dn{color:var(--green);}
+.bar{height:8px;background:#EDF1F6;border-radius:4px;margin-top:8px;overflow:hidden;}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--navy2));border-radius:4px;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th,td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:right;}
+th{background:var(--navy);color:#fff;text-align:center;font-size:12px;}
+td:first-child{text-align:left;color:var(--sub);}
+tr.total td{font-weight:bold;color:var(--navy);background:#FFFDF6;border-top:2px solid var(--gold);font-size:14px;}
+.badge{display:inline-block;font-size:10px;background:var(--gold-l);color:var(--navy);border-radius:4px;padding:2px 6px;margin-left:6px;font-weight:bold;}
+.note{font-size:11px;color:var(--sub);line-height:1.6;margin-top:10px;}
+.note b{color:var(--navy);}
+footer{text-align:center;font-size:11px;color:var(--sub);padding:20px;}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="brand">YU&KIM FAMILY</div>
+    <h1>26세법개정안 종합부동산세 시뮬레이션</h1>
+    <div class="sub">연도별(2026~2029) 종부세 부담 비교 · (공시가격−기본공제)×공정시장가액비율×세율−세액공제</div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<div class="card">
+  <h2>보유 현황 입력</h2>
+  <div class="grid">
+    <div class="field">
+      <label>주택 공시가격 합산 (억원)</label>
+      <input type="number" id="price" value="20" min="0" step="0.5">
+      <div class="hint">모든 보유주택 공시가격 합계 (시가의 약 70% 수준)</div>
+    </div>
+    <div class="field">
+      <label>주택 수</label>
+      <div class="seg" id="segHouse">
+        <button data-v="1" class="on">1주택</button>
+        <button data-v="2">2주택</button>
+        <button data-v="3">3주택 이상</button>
+      </div>
+    </div>
+    <div class="field" id="fResid">
+      <label>1주택 거주 여부</label>
+      <div class="seg" id="segResid">
+        <button data-v="Y" class="on">거주(실거주)</button>
+        <button data-v="N">비거주</button>
+      </div>
+      <div class="hint">개편안: 거주용 1주택 공제 14억 / 비거주 1주택 9억</div>
+    </div>
+    <div class="field" id="fLocal" style="display:none">
+      <label>2주택 유형</label>
+      <div class="seg" id="segLocal">
+        <button data-v="local" class="on">지방 저가 2주택</button>
+        <button data-v="etc">그 외 2주택</button>
+      </div>
+      <div class="hint">지방 2주택은 공정시장가액비율 70% 유지(2028~)</div>
+    </div>
+    <div class="field" id="fResidVal" style="display:none">
+      <label>거주용 주택 공시가격 (억원)</label>
+      <input type="number" id="residVal" value="10" min="0" step="0.5">
+      <div class="hint">다주택 기본공제 = 4억 + 5억 × (거주용 주택가액 ÷ 전체 주택가액)</div>
+    </div>
+    <div class="field" id="fAge">
+      <label>연령 (만)</label>
+      <select id="age">
+        <option value="0">60세 미만</option>
+        <option value="60">60~64세</option>
+        <option value="65" selected>65~69세</option>
+        <option value="70">70세 이상</option>
+      </select>
+    </div>
+    <div class="field" id="fHold">
+      <label>보유 기간</label>
+      <select id="hold">
+        <option value="0">5년 미만</option>
+        <option value="5">5~9년</option>
+        <option value="10" selected>10~14년</option>
+        <option value="15">15년 이상</option>
+      </select>
+    </div>
+    <div class="field" id="fLive">
+      <label>거주 기간</label>
+      <select id="live">
+        <option value="0">5년 미만</option>
+        <option value="5">5~9년</option>
+        <option value="10" selected>10~14년</option>
+        <option value="15">15년 이상</option>
+      </select>
+      <div class="hint">2028년~ 세액공제: 보유공제·거주공제 중 유리한 것 선택</div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>연도별 종부세 비교 <span class="badge">농특세 20% 포함</span></h2>
+  <div class="cmpgrid" id="cmpGrid"></div>
+  <div class="note" id="cmpNote"></div>
+</div>
+
+<div class="card">
+  <h2>상세 계산 내역</h2>
+  <div class="yeartabs" id="yearTabs">
+    <button data-y="2026">2026<br><span style="font-size:10px;font-weight:normal">현행</span></button>
+    <button data-y="2027" class="on">2027<br><span style="font-size:10px;font-weight:normal">1단계</span></button>
+    <button data-y="2028">2028<br><span style="font-size:10px;font-weight:normal">개편완성</span></button>
+    <button data-y="2029">2029<br><span style="font-size:10px;font-weight:normal">유지</span></button>
+  </div>
+  <table id="detailTbl"></table>
+  <div class="note" id="detailNote"></div>
+</div>
+
+<div class="card">
+  <h2>연도별 제도 요약</h2>
+  <table>
+    <tr><th>항목</th><th>2026(현행)</th><th>2027</th><th>2028~29</th></tr>
+    <tr><td>기본공제(거주 1주택)</td><td>12억</td><td>14억</td><td>14억</td></tr>
+    <tr><td>기본공제(비거주 1주택)</td><td>12억</td><td>9억</td><td>9억</td></tr>
+    <tr><td>기본공제(다주택)</td><td>9억</td><td colspan="2">4억+5억×거주용비중</td></tr>
+    <tr><td>공정시장가액비율</td><td>60%</td><td>70%</td><td>70~80%</td></tr>
+    <tr><td>최고세율</td><td>2.7~5.0%</td><td>3.5~5.0%</td><td>5.0% 단일</td></tr>
+    <tr><td>세액공제 한도</td><td>없음(80%)</td><td>800만원</td><td>600만원</td></tr>
+  </table>
+</div>
+
+<footer>
+  본 계산기는 2026.8.4 발표 세제개편안 언론보도(매일경제)를 바탕으로 한 참고용 시뮬레이션입니다.<br>
+  재산세 공제·세부담상한 등은 미반영이며, 실제 세액은 세무 전문가 확인이 필요합니다.<br>
+  © YU&KIM FAMILY OFFICE
+</footer>
+</div>
+
+<script>
+// ============ 상태 ============
+const S = { houses:1, resid:'Y', local:'local', year:2027 };
+const 억 = 100000000;
+
+// ============ 연도별 파라미터 ============
+// 세율표: [상한(억), 세율%] 누진
+const RATES = {
+  cur12:  [[3,0.5],[6,0.7],[12,1.0],[25,1.3],[50,1.5],[94,2.0],[Infinity,2.7]],
+  cur3:   [[3,0.5],[6,0.7],[12,1.0],[25,2.0],[50,3.0],[94,4.0],[Infinity,5.0]],
+  y27_12: [[3,0.5],[6,0.7],[12,1.3],[25,1.5],[50,2.0],[94,2.7],[Infinity,3.5]],
+  y28all: [[3,0.5],[6,0.7],[12,1.3],[25,2.0],[50,3.0],[94,4.0],[Infinity,5.0]]
+};
+
+function params(year){
+  const y = year>=2029 ? 2028 : year; // 2029 = 2028 유지 가정
+  return {
+    y2026: y===2026, y2027: y===2027, y2028: y>=2028,
+  };
+}
+
+// 기본공제 (억원)
+function basicDeduction(year){
+  if(year===2026){
+    return S.houses===1 ? 12 : 9;
+  }
+  // 2027~ 개편안
+  if(S.houses===1) return S.resid==='Y' ? 14 : 9;
+  const total = num('price'), rv = Math.min(num('residVal'), total);
+  return 4 + 5*(total>0 ? rv/total : 0);
+}
+
+// 공정시장가액비율
+function fmv(year){
+  if(year===2026) return 0.60;
+  if(year===2027) return 0.70;
+  // 2028~
+  const isFav = (S.houses===1) || (S.houses===2 && S.local==='local');
+  return isFav ? 0.70 : 0.80;
+}
+
+// 세율표 선택
+function rateTable(year){
+  const multi3 = S.houses>=3 || (S.houses===2 && S.local==='etc' /* 조정지역 가정 아님 — 3주택 중과는 3주택만 */);
+  // 현행/2027: 1·2주택 vs 3주택 이상 (조정지역 2주택 중과는 단순화하여 3주택 표 적용 안함)
+  if(year===2026) return S.houses>=3 ? RATES.cur3 : RATES.cur12;
+  if(year===2027) return S.houses>=3 ? RATES.y28all : RATES.y27_12;
+  return RATES.y28all; // 2028~ 모든 주택 단일
+}
+
+// 누진세액 계산 (과세표준: 억원) → 원
+function progressive(base, table){
+  let tax=0, prev=0;
+  for(const [cap,rate] of table){
+    if(base<=prev) break;
+    const span = Math.min(base,cap)-prev;
+    tax += span*억*rate/100;
+    prev = cap;
+  }
+  return tax;
+}
+
+// 세액공제 (1주택 거주자만)
+function taxCredit(year, grossTax){
+  if(S.houses!==1 || S.resid!=='Y') return {credit:0, label:'해당 없음(1주택 거주자 한정)'};
+  const age=+val('age'), hold=+val('hold'), live=+val('live');
+  if(year<=2027){
+    let ageR = age>=70?40:age>=65?30:age>=60?20:0;
+    let holdR = hold>=15?50:hold>=10?40:hold>=5?20:0;
+    let r = Math.min(ageR+holdR, 80);
+    let c = grossTax*r/100;
+    let capTxt='';
+    if(year===2027){ c=Math.min(c, 8000000); capTxt=' (한도 800만원)'; }
+    return {credit:c, label:`연령 ${ageR}% + 보유 ${holdR}% = ${r}%${capTxt}`};
+  }
+  // 2028~: 보유 vs 거주 중 선택, 한도 600만원
+  let holdR = hold>=15?25:hold>=10?20:hold>=5?10:0;
+  let liveR = live>=15?50:live>=10?40:live>=5?20:0;
+  const pick = liveR>=holdR ? {r:liveR, t:'거주'} : {r:holdR, t:'보유'};
+  let c = Math.min(grossTax*pick.r/100, 6000000);
+  return {credit:c, label:`${pick.t}공제 ${pick.r}% 선택 (한도 600만원)`};
+}
+
+// 연도별 전체 계산
+function calc(year){
+  const price = num('price');
+  const ded = basicDeduction(year);
+  const f = fmv(year);
+  const base = Math.max(0, (price-ded))*f;   // 과세표준(억)
+  const gross = progressive(base, rateTable(year));
+  const {credit, label} = taxCredit(year, gross);
+  const jbs = Math.max(0, gross-credit);
+  const nongteuk = jbs*0.2;
+  return {price, ded, fmvRate:f, base, gross, credit, creditLabel:label, jbs, nongteuk, total:jbs+nongteuk};
+}
+
+// ============ 유틸 ============
+function num(id){ return parseFloat(document.getElementById(id).value)||0; }
+function val(id){ return document.getElementById(id).value; }
+function won(v){
+  if(v>=억) return (v/억).toFixed(2).replace(/\.?0+$/,'')+'억원';
+  return Math.round(v/10000).toLocaleString()+'만원';
+}
+function wonFull(v){ return '₩'+Math.round(v).toLocaleString(); }
+
+// ============ 렌더 ============
+function render(){
+  const years=[2026,2027,2028,2029];
+  const res = years.map(y=>({y, ...calc(y)}));
+  const maxT = Math.max(...res.map(r=>r.total), 1);
+
+  // 비교 카드
+  document.getElementById('cmpGrid').innerHTML = res.map((r,i)=>{
+    let diff='';
+    if(i>0){
+      const d=r.total-res[0].total;
+      diff = d===0?'<span class="diff">현행과 동일</span>'
+        : `<span class="diff ${d>0?'up':'dn'}">${d>0?'▲':'▼'} ${won(Math.abs(d))} vs 현행</span>`;
+    } else diff='<span class="diff">기준(현행)</span>';
+    return `<div class="cmp ${S.year===r.y?'on':''}" onclick="setYear(${r.y})">
+      <div class="yy">${r.y}년${r.y===2029?' (유지)':''}</div>
+      <div class="amt">${won(r.total)}</div>
+      ${diff}
+      <div class="bar"><i style="width:${Math.max(3,r.total/maxT*100)}%"></i></div>
+    </div>`;
+  }).join('');
+
+  const first=res[0], last=res[2];
+  const chg = first.total>0 ? ((last.total-first.total)/first.total*100).toFixed(0) : '—';
+  document.getElementById('cmpNote').innerHTML =
+    `<b>총부담(종부세+농특세)</b> 기준 · 2028년 개편 완성 시 현행 대비 <b>${chg==='—'?'—':(chg>0?'+':'')+chg+'%'}</b> 변화 · 카드를 누르면 상세 내역이 바뀝니다.`;
+
+  // 상세 테이블
+  const r = res.find(x=>x.y===S.year);
+  document.getElementById('detailTbl').innerHTML = `
+    <tr><th>항목</th><th>금액</th></tr>
+    <tr><td>공시가격 합산</td><td>${r.price}억원</td></tr>
+    <tr><td>기본공제 (−)</td><td>${r.ded.toFixed(2).replace(/\.?0+$/,'')}억원</td></tr>
+    <tr><td>공정시장가액비율 (×)</td><td>${(r.fmvRate*100).toFixed(0)}%</td></tr>
+    <tr><td>과세표준</td><td>${r.base.toFixed(2)}억원</td></tr>
+    <tr><td>산출세액 (누진)</td><td>${wonFull(r.gross)}</td></tr>
+    <tr><td>세액공제 (−)<br><span style="font-size:11px">${r.creditLabel}</span></td><td>${wonFull(r.credit)}</td></tr>
+    <tr><td>종합부동산세</td><td>${wonFull(r.jbs)}</td></tr>
+    <tr><td>농어촌특별세 (20%)</td><td>${wonFull(r.nongteuk)}</td></tr>
+    <tr class="total"><td>총합계 (총 납부액)</td><td>${wonFull(r.total)}</td></tr>`;
+
+  const notes={
+    2026:'현행 제도: 1주택 공제 12억(거주 무관) · FMV 60% · 세액공제 최대 80% 무한도',
+    2027:'개편 1단계: 거주 1주택 14억/비거주 9억 · FMV 70% · 1·2주택 세율 상향 · 세액공제 한도 800만원 신설',
+    2028:'개편 완성: 주택 수 무관 가격 기준 단일세율(최고 5.0%) · FMV 70~80% · 세액공제 보유/거주 선택, 한도 600만원',
+    2029:'2028년 개편 완성 체계 유지 가정 (기사상 종부세 추가 변경 없음)'
+  };
+  document.getElementById('detailNote').innerHTML = '※ '+notes[S.year];
+
+  // 필드 표시/숨김
+  document.getElementById('fResid').style.display = S.houses===1?'':'none';
+  document.getElementById('fLocal').style.display = S.houses===2?'':'none';
+  document.getElementById('fResidVal').style.display = S.houses>=2?'':'none';
+  const showCredit = S.houses===1 && S.resid==='Y';
+  ['fAge','fHold','fLive'].forEach(id=>document.getElementById(id).style.display=showCredit?'':'none');
+
+  // 연도 탭
+  document.querySelectorAll('#yearTabs button').forEach(b=>b.classList.toggle('on', +b.dataset.y===S.year));
+}
+
+function setYear(y){ S.year=y; render(); }
+
+// ============ 이벤트 ============
+function bindSeg(id, key){
+  document.querySelectorAll('#'+id+' button').forEach(b=>{
+    b.onclick=()=>{
+      document.querySelectorAll('#'+id+' button').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on');
+      S[key] = isNaN(+b.dataset.v)? b.dataset.v : +b.dataset.v;
+      render();
+    };
+  });
+}
+bindSeg('segHouse','houses');
+bindSeg('segResid','resid');
+bindSeg('segLocal','local');
+document.querySelectorAll('#yearTabs button').forEach(b=>b.onclick=()=>setYear(+b.dataset.y));
+['price','residVal','age','hold','live'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',render);
+  document.getElementById(id).addEventListener('change',render);
+});
+render();
+</script>
+</body>
+</html>
