@@ -140,9 +140,10 @@ footer{text-align:center;font-size:11px;color:var(--sub);padding:20px;}
 
 <div class="card">
   <h2>상세 계산 내역</h2>
+  <p style="margin:0 0 8px;font-size:12px;color:#b3261e;font-weight:600">⚠ 2026년만 현행법(확정)입니다. 2027~2029년은 정부 발표 개편안으로 아직 국회를 통과하지 않았으며, 국회 심의 과정에서 수치가 바뀔 수 있습니다. 국회 통과 후 확정안으로 업데이트 예정입니다.</p>
   <div class="yeartabs" id="yearTabs">
-    <button data-y="2026">2026<br><span style="font-size:10px;font-weight:normal">현행</span></button>
-    <button data-y="2027" class="on">2027<br><span style="font-size:10px;font-weight:normal">1단계</span></button>
+    <button data-y="2026" class="on">2026<br><span style="font-size:10px;font-weight:normal">현행</span></button>
+    <button data-y="2027">2027<br><span style="font-size:10px;font-weight:normal">1단계</span></button>
     <button data-y="2028">2028<br><span style="font-size:10px;font-weight:normal">개편완성</span></button>
     <button data-y="2029">2029<br><span style="font-size:10px;font-weight:normal">유지</span></button>
   </div>
@@ -172,7 +173,7 @@ footer{text-align:center;font-size:11px;color:var(--sub);padding:20px;}
 
 <script>
 // ============ 상태 ============
-const S = { houses:1, resid:'Y', local:'local', year:2027 };
+const S = { houses:1, resid:'Y', local:'local', year:2026 };
 const 억 = 100000000;
 
 // ============ 연도별 파라미터 ============
